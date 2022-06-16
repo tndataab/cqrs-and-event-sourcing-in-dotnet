@@ -1,0 +1,95 @@
+﻿@model Domain.Order
+@{
+    ViewData["Title"] = "OrderDetails";
+}
+
+<h1>Order details</h1>
+<table>
+    <tr>
+        <td>Id:</td>
+        <td>@Model.Id</td>
+    </tr>
+    <tr>
+        <td>State:</td>
+        <td>@Model.orderState</td>
+    </tr>
+    <tr>
+        <td>Customer id:</td>
+        <td>@Model.CustomerId</td>
+    </tr>
+    <tr>
+        <td>Customer name:</td>
+        <td>@Model.CustomerName</td>
+    </tr>
+    <tr>
+        <td>Order value:</td>
+        <td>@Model.OrderValue</td>
+    </tr>
+</table>
+
+
+<hr />
+<h3>Order lines</h3>
+
+<table class="table">
+    <tr>
+        <th>Id</th>
+        <th>ProductId</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th></th>
+
+    </tr>
+
+    @foreach (var orderLine in Model.orderLines)
+    {
+        <tr>
+            <td>@orderLine.Id</td>
+            <td>@orderLine.ProductId</td>
+            <td>@orderLine.Name</td>
+            <td>@orderLine.Price</td>
+            <td>@orderLine.Quantity</td>
+            <td> <a asp-action="DeleteOrderLine" asp-route-orderid="@Model.Id" asp-route-orderlineid="@orderLine.Id">Delete</a></td>
+        </tr>
+    }
+</table>
+<br />
+<hr>
+
+<h4>Add new orderline</h4>
+<form asp-action="AddOrderLine">
+    <table>
+        <tr>
+            <th>ProductId</th>
+            <th>Product Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th></th>
+        </tr>
+
+        <tr>
+
+            <td><input type="text" name="ProductId"><br></td>
+            <td><input type="text" name="Name"><br></td>
+            <td><input type="text" name="Price"><br></td>
+            <td><input type="text" name="Quantity"><br></td>
+            <td><input type="hidden" name="OrderId" value="@Model.Id"><br></td>
+        </tr>
+    </table>
+
+    <input type="submit" value="Add orderline" class="btn btn-primary" />
+</form>
+
+<br />
+<br />
+
+@if (@Model.orderState == Domain.OrderState.New)
+{
+    <h4>Cancel order</h4>
+    <form asp-action="CancelOrder">
+        <input type="hidden" name="OrderId" value="@Model.Id">
+        <input type="submit" value="Cancel order" class="btn btn-primary" />
+    </form>
+}
+

@@ -1,0 +1,33 @@
+﻿@model IEnumerable<Domain.OrderSummary>
+
+@{
+    ViewData["Title"] = "ListAllOrders";
+}
+
+<h1>List of all orders</h1>
+
+<table class="table">
+    <tr>
+        <th>Id</th>
+        <th>State</th>
+        <th>Customer Id</th>
+        <th>Customer Name</th>
+        <th>OrderValue</th>
+        <th></th>
+
+    </tr>
+
+    @foreach (var order in Model)
+    {
+        <tr>
+            <td>@order.Id</td>
+            <td>@order.orderState</td>
+            <td>@order.CustomerId</td>
+            <td>@order.CustomerName</td>
+            <td>@order.OrderValue</td>
+            <td>
+                <a asp-action="OrderDetails" asp-route-id="@order.Id">Details</a>
+            </td>
+        </tr>
+    }
+</table>

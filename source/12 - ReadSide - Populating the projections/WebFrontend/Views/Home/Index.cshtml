@@ -1,0 +1,51 @@
+﻿@using Newtonsoft.Json
+@inject Domain.IEventStore eventStore
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+
+
+<a href="/Home/ListAllOrders">List all orders</a><br />
+<a href="/Home/CreateNewOrder">Create new order</a><br />
+<hr />
+
+<h4>EventStore</h4>
+@{
+    int counter = 0;
+}
+
+<table border="1" class="table-striped" cellpadding="10">
+
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Event</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var evnt in eventStore.GetAllEvents())
+        {
+            <tr>
+                <td>@counter</td>
+                <td>
+
+                    <b>@evnt.GetType()</b><br>
+                    @Html.Raw(@JsonConvert.SerializeObject(evnt, Formatting.Indented).Replace("\n", "\n"))
+
+                </td>
+
+
+            </tr>
+
+            counter = counter + 1;
+        }
+    </tbody>
+
+</table>
