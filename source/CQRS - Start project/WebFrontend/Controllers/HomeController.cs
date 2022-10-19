@@ -32,13 +32,6 @@ namespace WebFrontend.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public IActionResult DeleteOrderLine(int orderId, int orderLineId)
-        {
-            orderService.DeleteOrderLine(orderId, orderLineId);
-
-            return RedirectToAction("OrderDetails", new { id = orderId });
-        }
-
         public IActionResult CreateNewOrder()
         {
             return View(new CreateOrderModel());
@@ -52,6 +45,20 @@ namespace WebFrontend.Controllers
             return RedirectToAction("OrderDetails", new { id = orderId });
         }
 
+        [HttpPost]
+        public IActionResult CancelOrder(int OrderId)
+        {
+            orderService.UpdateOrderState(OrderId, OrderState.cancel);
+
+            return RedirectToAction("OrderDetails", new { id = OrderId });
+        }
+
+        public IActionResult DeleteOrderLine(int orderId, int orderLineId)
+        {
+            orderService.DeleteOrderLine(orderId, orderLineId);
+
+            return RedirectToAction("OrderDetails", new { id = orderId });
+        }
 
         [HttpPost]
         public IActionResult AddOrderLine(int orderId, OrderLine orderline)
@@ -61,12 +68,11 @@ namespace WebFrontend.Controllers
             return RedirectToAction("OrderDetails", new { id = orderId });
         }
 
-        [HttpPost]
-        public IActionResult CancelOrder(int OrderId)
+        public IActionResult OrderDetails(int id)
         {
-            orderService.UpdateOrderState(OrderId, OrderState.cancel);
+            var order = orderService.LoadOrder(id);
 
-            return RedirectToAction("OrderDetails", new { id = OrderId });
+            return View(order);
         }
 
         public IActionResult ListAllOrders()
@@ -74,13 +80,6 @@ namespace WebFrontend.Controllers
             var orders = orderService.LoadAllOrders();
 
             return View(orders);
-        }
-
-        public IActionResult OrderDetails(int id)
-        {
-            var order = orderService.LoadOrder(id);
-
-            return View(order);
         }
     }
 }
