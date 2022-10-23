@@ -1,11 +1,11 @@
 # CQRS and Event Sourcing in .NET
-This repository contains the start code and solutions for the <a href="https://learning.oreilly.com/live-events/cqrs-and-event-sourcing-in-net/0636920080710/0636920080709/" target="_blank">CQRS and Event Sourcing in .NET</a> training class. It contains the code needed to follow along in the class.   
+This repository contains the start code and solutions for the <a href="https://learning.oreilly.com/live-events/cqrs-and-event-sourcing-in-net/0636920080710/0636920080709/" target="_blank">CQRS and Event Sourcing in .NET</a> training course. It includes the code needed to follow along in the course.   
 
 The start code for the class is found in the <a href="https://github.com/tndataab/cqrs-and-event-sourcing-in-dotnet/tree/main/source/CQRS%20-%20Start%20project" target="_blank">/source/CQRS - Start project</a> folder.
 
-Feel free to submit issues if you have suggestions for improvements to the code or training class.
+Feel free to submit an issue or <a href="https://tn-data.se/contact/" target="_blank">contact me</a> if you have suggestions to improve the code or training class.
 
-The code in the class is influenced by the code and tutorial found at https://cqrs.nu, a site I co-authored with my excellent colleagues. 
+The code in the class is influenced by the code and tutorial found at <a href="https://cqrs.nu" target="_blank">https://cqrs.nu</a>, a site I co-authored with my excellent colleagues. 
 
 ## Author Details
 
