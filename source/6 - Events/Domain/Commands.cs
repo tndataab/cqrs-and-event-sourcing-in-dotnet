@@ -21,6 +21,7 @@ namespace Domain
     public class CancelOrder : ICommand
     {
         public Guid Id { get; set; }
+        public OrderState OrderState { get; set; }
     }
 
     public class DeleteOrderLine : ICommand
@@ -28,10 +29,10 @@ namespace Domain
         public Guid Id { get; set; }
         public Guid OrderLineId { get; set; }
     }
+
     public class AddOrderLine : ICommand
     {
         public Guid Id { get; set; }
         public OrderLine OrderLine { get; set; }
     }
-
 }

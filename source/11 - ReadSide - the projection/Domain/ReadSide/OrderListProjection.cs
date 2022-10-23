@@ -6,22 +6,25 @@ using System.Threading.Tasks;
 
 namespace Domain.ReadSide
 {
-public abstract class Projection
-{
-
-}
-
     public interface IBuildFrom<TEvent>
     {
         void Apply(TEvent e);
     }
 
-    public class OrderListProjection :  Projection,
+    public abstract class Projection
+    {
+
+    }
+
+    public class OrderListProjection : Projection,
                                         IBuildFrom<OrderCreated>,
                                         IBuildFrom<OrderCancelled>,
                                         IBuildFrom<OrderLineAdded>,
                                         IBuildFrom<OrderLineDeleted>
+
     {
+        private Dictionary<Guid, OrderDetails> orderDict = new();
+
         private class OrderDetails
         {
             public Guid Id { get; set; }
@@ -31,8 +34,6 @@ public abstract class Projection
             public decimal OrderValue { get; set; }
             public List<OrderLine> orderLines { get; set; }
         }
-
-        private Dictionary<Guid, OrderDetails> orderDict = new();
 
         public void Apply(OrderCreated e)
         {
@@ -45,7 +46,6 @@ public abstract class Projection
                 OrderValue = 0,
                 orderLines = new List<OrderLine>()
             });
-
         }
 
         public void Apply(OrderCancelled e)
@@ -57,7 +57,6 @@ public abstract class Projection
         {
             orderDict[e.Id].orderLines.Add(e.OrderLine);
             orderDict[e.Id].OrderValue = CalculateOrderValue(orderDict[e.Id]);
-
         }
 
         public void Apply(OrderLineDeleted e)
@@ -66,20 +65,7 @@ public abstract class Projection
             orderDict[e.Id].OrderValue = CalculateOrderValue(orderDict[e.Id]);
         }
 
-        private decimal CalculateOrderValue(OrderDetails order)
-        {
-            decimal totalValue = 0;
-            foreach (var line in order.orderLines)
-            {
-                totalValue = totalValue + line.Price * line.Quantity;
-            }
-
-            return totalValue;
-        }
-
-
-
-        public List<OrderSummary> GetOrdersummaryList()
+        public List<OrderSummary> GetOrderSummaryList()
         {
             return orderDict.Values.Select(o =>
                     new OrderSummary()
@@ -93,5 +79,15 @@ public abstract class Projection
             ).ToList();
         }
 
+        private decimal CalculateOrderValue(OrderDetails order)
+        {
+            decimal totalValue = 0;
+            foreach (var line in order.orderLines)
+            {
+                totalValue = totalValue + line.Price * line.Quantity;
+            }
+
+            return totalValue;
+        }
     }
 }

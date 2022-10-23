@@ -1,16 +1,11 @@
 ﻿namespace Domain;
 
-
-
 public interface IHandleCommand<in T> where T : ICommand
 {
     void Handle(T command);
 }
 
-
-
-public class OrderService_WriteSide : IOrderService_WriteSide,
-                                      IHandleCommand<CreateOrder>,
+public class OrderService_WriteSide : IHandleCommand<CreateOrder>,
                                       IHandleCommand<CancelOrder>,
                                       IHandleCommand<DeleteOrderLine>,
                                       IHandleCommand<AddOrderLine>

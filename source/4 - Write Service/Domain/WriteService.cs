@@ -12,14 +12,14 @@ namespace Domain
         void HandleCommand<TCommand>(TCommand command) where TCommand : ICommand;
     }
 
-
     public class WriteService : IWriteService
     {
-        private readonly IOrderRepository orderRepository;
+        private readonly IOrderRepository repository;
+        private readonly Dictionary<Type, Action<ICommand>> commandHandlers = new();
 
-        public WriteService(IOrderRepository orderRepository)
+        public WriteService(IOrderRepository repository)
         {
-            this.orderRepository = orderRepository;
+            this.repository = repository;
 
             ScanAssembly();
         }
@@ -51,25 +51,26 @@ namespace Domain
             }
         }
 
-        private readonly Dictionary<Type, Action<ICommand>> commandHandlers = new();
-
         public void AddCommandHandlerFor<TCommand, THandler>() where TCommand : ICommand
-                                                               where THandler : IHandleCommand<TCommand>
+                                                                where THandler : IHandleCommand<TCommand>
         {
-            var handler = (THandler)Activator.CreateInstance(typeof(THandler), new object[] { orderRepository });
+            var handler = (THandler)Activator.CreateInstance(typeof(THandler), new object[] { repository });
 
             commandHandlers.Add(typeof(TCommand), c =>
             {
                 handler.Handle((TCommand)c);
             });
-        }
 
+        }
 
         public void HandleCommand<TCommand>(TCommand command) where TCommand : ICommand
         {
+            Console.WriteLine("\r\nHandling command " + command.ToString());
+
             if (commandHandlers.ContainsKey(typeof(TCommand)))
             {
-                commandHandlers[typeof(TCommand)](command);
+                var handler = commandHandlers[typeof(TCommand)];
+                handler(command);
             }
             else
             {

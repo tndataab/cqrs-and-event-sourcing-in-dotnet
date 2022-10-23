@@ -12,8 +12,8 @@ namespace WebFrontend.Controllers
         private readonly IOrderService_ReadSide orderService_ReadSide;
 
         public HomeController(ILogger<HomeController> logger,
-                                     IOrderService_WriteSide orderService_WriteSide,
-                                     IOrderService_ReadSide orderService_ReadSide)
+                              IOrderService_WriteSide orderService_WriteSide,
+                              IOrderService_ReadSide orderService_ReadSide)
         {
             _logger = logger;
             this.orderService_WriteSide = orderService_WriteSide;
@@ -36,20 +36,6 @@ namespace WebFrontend.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public IActionResult DeleteOrderLine(Guid orderId, Guid orderLineId)
-        {
-            var writeside = (IHandleCommand<DeleteOrderLine>)orderService_WriteSide;
-            writeside.Handle(new DeleteOrderLine()
-            {
-                Id = orderId,
-                OrderLineId = orderLineId
-            });
-
-            //orderService_WriteSide.DeleteOrderLine(orderId, orderLineId);
-
-            return RedirectToAction("OrderDetails", new { id = orderId });
-        }
-
         public IActionResult CreateNewOrder()
         {
             return View(new CreateOrderModel());
@@ -61,6 +47,7 @@ namespace WebFrontend.Controllers
             var writeside = (IHandleCommand<CreateOrder>)orderService_WriteSide;
 
             var orderId = Guid.NewGuid();
+
             writeside.Handle(new CreateOrder()
             {
                 Id = orderId,
@@ -68,36 +55,48 @@ namespace WebFrontend.Controllers
                 CustomerName = CustomerName
             });
 
-            //orderService_WriteSide.CreateOrder(orderId, CustomerId, CustomerName);
+            return RedirectToAction("OrderDetails", new { id = orderId });
+        }
+
+        [HttpPost]
+        public IActionResult CancelOrder(Guid OrderId)
+        {
+            var writeside = (IHandleCommand<CancelOrder>)orderService_WriteSide;
+
+            writeside.Handle(new CancelOrder()
+            {
+                Id = OrderId
+            });
+
+            return RedirectToAction("OrderDetails", new { id = OrderId });
+        }
+
+        public IActionResult DeleteOrderLine(Guid orderId, Guid orderLineId)
+        {
+            var writeside = (IHandleCommand<DeleteOrderLine>)orderService_WriteSide;
+            writeside.Handle(new DeleteOrderLine()
+            {
+                Id = orderId,
+                OrderLineId = orderLineId
+            });
 
             return RedirectToAction("OrderDetails", new { id = orderId });
         }
 
-
         [HttpPost]
         public IActionResult AddOrderLine(Guid orderId, OrderLine orderline)
         {
-            //orderService_WriteSide.AddOrderLine(orderId, orderline);
+            orderline.Id = Guid.NewGuid();
 
             var writeside = (IHandleCommand<AddOrderLine>)orderService_WriteSide;
 
-            orderline.Id = Guid.NewGuid();
             writeside.Handle(new AddOrderLine()
             {
                 Id = orderId,
                 OrderLine = orderline
             });
 
-
             return RedirectToAction("OrderDetails", new { id = orderId });
-        }
-
-
-        public IActionResult ListAllOrders()
-        {
-            var orders = orderService_ReadSide.LoadAllOrders();
-
-            return View(orders);
         }
 
         public IActionResult OrderDetails(Guid id)
@@ -107,19 +106,11 @@ namespace WebFrontend.Controllers
             return View(order);
         }
 
-        [HttpPost]
-        public IActionResult CancelOrder(Guid OrderId)
+        public IActionResult ListAllOrders()
         {
-            //orderService_WriteSide.UpdateOrderState(OrderId, OrderState.cancel);
+            var orders = orderService_ReadSide.LoadAllOrders();
 
-            var writeside = (IHandleCommand<CancelOrder>)orderService_WriteSide;
-
-            writeside.Handle(new CancelOrder()
-            {
-                Id = OrderId
-            });
-
-            return RedirectToAction("OrderDetails", new { id = OrderId });
+            return View(orders);
         }
     }
 }

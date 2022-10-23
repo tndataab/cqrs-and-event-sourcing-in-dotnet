@@ -1,22 +1,20 @@
 ﻿namespace Domain;
 
-
-
 public interface IHandleCommand<in T> where T : ICommand
 {
     IEnumerable<IEvent> Handle(T command);
 }
 
-
 public abstract class Aggregate
-{
+{ 
 }
 
-public class OrderAggregate : Aggregate,
-                                IHandleCommand<CreateOrder>,
-                                IHandleCommand<CancelOrder>,
-                                IHandleCommand<DeleteOrderLine>,
-                                IHandleCommand<AddOrderLine>
+public class OrderAggregate : Aggregate, 
+                              IHandleCommand<CreateOrder>,
+                              IHandleCommand<CancelOrder>,
+                              IHandleCommand<DeleteOrderLine>,
+                              IHandleCommand<AddOrderLine>
+
 {
     private readonly IOrderRepository repository;
 
@@ -37,11 +35,12 @@ public class OrderAggregate : Aggregate,
         };
 
         repository.Insert(c.Id, order);
+        
         yield return new OrderCreated()
         {
             Id = c.Id,
             CustomerId = c.CustomerId,
-            CustomerName = c.CustomerName,
+            CustomerName = c.CustomerName
         };
     }
 
@@ -52,10 +51,12 @@ public class OrderAggregate : Aggregate,
         order.orderState = OrderState.cancel;
 
         repository.Update(c.Id, order);
+
         yield return new OrderCancelled()
         {
             Id = c.Id,
         };
+
     }
 
     public IEnumerable<IEvent> Handle(DeleteOrderLine c)
@@ -67,6 +68,7 @@ public class OrderAggregate : Aggregate,
             order.orderLines.Remove(ol);
 
         repository.Update(c.Id, order);
+
         yield return new OrderLineDeleted()
         {
             Id = c.Id,
@@ -81,11 +83,11 @@ public class OrderAggregate : Aggregate,
         order.orderLines.Add(c.OrderLine);
 
         repository.Update(c.Id, order);
+   
         yield return new OrderLineAdded()
         {
             Id = c.Id,
             OrderLine = c.OrderLine,
         };
     }
-
 }

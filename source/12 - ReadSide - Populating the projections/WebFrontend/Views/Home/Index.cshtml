@@ -1,5 +1,6 @@
 ﻿@using Newtonsoft.Json
 @inject Domain.IEventStore eventStore
+
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -13,8 +14,12 @@
 
 <a href="/Home/ListAllOrders">List all orders</a><br />
 <a href="/Home/CreateNewOrder">Create new order</a><br />
-<hr />
 
+
+
+
+
+<hr />
 <h4>EventStore</h4>
 @{
     int counter = 0;

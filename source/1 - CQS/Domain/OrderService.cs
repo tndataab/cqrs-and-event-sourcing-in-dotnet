@@ -3,11 +3,11 @@
 public interface IOrderService
 {
     //Commands
-    void CreateOrder(Guid OrderId, int customerId, string customerName);
+    void CreateOrder(Guid orderId, int customerId, string customerName);
     void UpdateOrderState(Guid orderId, OrderState orderState);
     void DeleteOrderLine(Guid orderId, Guid orderLineId);
     void AddOrderLine(Guid orderId, OrderLine orderLine);
-
+  
     //Queries
     Order LoadOrder(Guid orderId);
     List<OrderSummary> LoadAllOrders();
@@ -60,7 +60,6 @@ public class OrderService : IOrderService
     {
         var order = repository.Load(orderId);
 
-        orderLine.Id = Guid.NewGuid();
         order.orderLines.Add(orderLine);
 
         repository.Update(orderId, order);

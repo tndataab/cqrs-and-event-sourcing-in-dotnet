@@ -1,35 +1,27 @@
 ﻿namespace Domain;
 
-
-
 public interface IHandleCommand<in T> where T : ICommand
 {
     IEnumerable<IEvent> Handle(T command);
 }
 
-public interface IApplyEvent<TEvent>
-{
-    void Apply(TEvent e);
-}
-
-
 public abstract class Aggregate
 {
     public void ApplyEvents(IEnumerable<IEvent> events)
     {
-
+        //TODO:
     }
 }
 
-public class OrderAggregate : Aggregate,
+public class OrderAggregate : Aggregate, 
                               IHandleCommand<CreateOrder>,
                               IHandleCommand<CancelOrder>,
                               IHandleCommand<DeleteOrderLine>,
                               IHandleCommand<AddOrderLine>
+
 {
     public OrderAggregate()
     {
-
     }
 
     public IEnumerable<IEvent> Handle(CreateOrder c)
@@ -44,11 +36,12 @@ public class OrderAggregate : Aggregate,
         //};
 
         //repository.Insert(c.Id, order);
+        
         yield return new OrderCreated()
         {
             Id = c.Id,
             CustomerId = c.CustomerId,
-            CustomerName = c.CustomerName,
+            CustomerName = c.CustomerName
         };
     }
 
@@ -59,10 +52,12 @@ public class OrderAggregate : Aggregate,
         //order.orderState = OrderState.cancel;
 
         //repository.Update(c.Id, order);
+
         yield return new OrderCancelled()
         {
             Id = c.Id,
         };
+
     }
 
     public IEnumerable<IEvent> Handle(DeleteOrderLine c)
@@ -74,6 +69,7 @@ public class OrderAggregate : Aggregate,
         //    order.orderLines.Remove(ol);
 
         //repository.Update(c.Id, order);
+
         yield return new OrderLineDeleted()
         {
             Id = c.Id,
@@ -88,27 +84,11 @@ public class OrderAggregate : Aggregate,
         //order.orderLines.Add(c.OrderLine);
 
         //repository.Update(c.Id, order);
+   
         yield return new OrderLineAdded()
         {
             Id = c.Id,
             OrderLine = c.OrderLine,
         };
     }
-
-}
-
-
-public class OrderAggregate : Aggregate,
-                              IHandleCommand<CreateOrder>,
-                              IHandleCommand<CancelOrder>,
-                              IHandleCommand<DeleteOrderLine>,
-                              IHandleCommand<AddOrderLine>
-{
-    public IEnumerable<IEvent> Handle(CreateOrder c) { }
-
-    public IEnumerable<IEvent> Handle(CancelOrder c) { }
-
-    public IEnumerable<IEvent> Handle(DeleteOrderLine c) { }
-
-    public IEnumerable<IEvent> Handle(AddOrderLine c) { }
 }

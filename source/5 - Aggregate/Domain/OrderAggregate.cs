@@ -1,22 +1,20 @@
 ﻿namespace Domain;
 
-
-
 public interface IHandleCommand<in T> where T : ICommand
 {
     void Handle(T command);
 }
 
-
 public abstract class Aggregate
-{
+{ 
 }
 
-public class OrderAggregate : Aggregate,
-                                IHandleCommand<CreateOrder>,
-                                IHandleCommand<CancelOrder>,
-                                IHandleCommand<DeleteOrderLine>,
-                                IHandleCommand<AddOrderLine>
+public class OrderAggregate : Aggregate, 
+                              IHandleCommand<CreateOrder>,
+                              IHandleCommand<CancelOrder>,
+                              IHandleCommand<DeleteOrderLine>,
+                              IHandleCommand<AddOrderLine>
+
 {
     private readonly IOrderRepository repository;
 
@@ -67,5 +65,4 @@ public class OrderAggregate : Aggregate,
 
         repository.Update(c.Id, order);
     }
-
 }

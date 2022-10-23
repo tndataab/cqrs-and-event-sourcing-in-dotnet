@@ -1,7 +1,5 @@
 ﻿namespace Domain;
 
-
-
 public interface IHandleCommand<in T> where T : ICommand
 {
     IEnumerable<IEvent> Handle(T command);
@@ -34,7 +32,7 @@ public abstract class Aggregate
     }
 }
 
-public class OrderAggregate : Aggregate,
+public class OrderAggregate : Aggregate, 
                               IHandleCommand<CreateOrder>,
                               IHandleCommand<CancelOrder>,
                               IHandleCommand<DeleteOrderLine>,
@@ -43,17 +41,18 @@ public class OrderAggregate : Aggregate,
                               IApplyEvent<OrderCancelled>,
                               IApplyEvent<OrderLineAdded>,
                               IApplyEvent<OrderLineDeleted>
+
+
 {
-    public OrderAggregate()
-    {
-
-    }
-
-    private Guid orderId = Guid.NewGuid();
+    private Guid orderId;
     private int customerId;
     private string customerName;
     private OrderState orderState;
     private List<OrderLine> orderlines = new();
+
+    public OrderAggregate()
+    {
+    }
 
     public Order GetOrderQuery()
     {
@@ -70,24 +69,13 @@ public class OrderAggregate : Aggregate,
         return order;
     }
 
-    private decimal CalculateOrderValue()
-    {
-        decimal totalValue = 0;
-        foreach (var line in orderlines)
-        {
-            totalValue = totalValue + line.Price * line.Quantity;
-        }
-
-        return totalValue;
-    }
-
-
     public void Apply(OrderCreated e)
     {
         orderId = e.Id;
         customerId = e.CustomerId;
         customerName = e.CustomerName;
         orderState = OrderState.New;
+
     }
 
     public void Apply(OrderCancelled e)
@@ -107,16 +95,20 @@ public class OrderAggregate : Aggregate,
 
     public IEnumerable<IEvent> Handle(CreateOrder c)
     {
+        //TODO: Command validation
+
         yield return new OrderCreated()
         {
             Id = c.Id,
             CustomerId = c.CustomerId,
-            CustomerName = c.CustomerName,
+            CustomerName = c.CustomerName
         };
     }
 
     public IEnumerable<IEvent> Handle(CancelOrder c)
     {
+        //TODO: Command validation
+
         yield return new OrderCancelled()
         {
             Id = c.Id,
@@ -125,6 +117,11 @@ public class OrderAggregate : Aggregate,
 
     public IEnumerable<IEvent> Handle(DeleteOrderLine c)
     {
+        //TODO: Command validation
+
+        if (orderState == OrderState.cancel)
+            throw new Exception("Can't modify a cancelled order");
+
         yield return new OrderLineDeleted()
         {
             Id = c.Id,
@@ -134,10 +131,27 @@ public class OrderAggregate : Aggregate,
 
     public IEnumerable<IEvent> Handle(AddOrderLine c)
     {
+        //TODO: Command validation
+
+        if (orderState == OrderState.cancel)
+            throw new Exception("Can't modify a cancelled order");
+
         yield return new OrderLineAdded()
         {
             Id = c.Id,
             OrderLine = c.OrderLine,
         };
     }
+
+    private decimal CalculateOrderValue()
+    {
+        decimal totalValue = 0;
+        foreach (var line in orderlines)
+        {
+            totalValue = totalValue + line.Price * line.Quantity;
+        }
+
+        return totalValue;
+    }
+
 }

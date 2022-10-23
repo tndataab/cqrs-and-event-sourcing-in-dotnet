@@ -11,9 +11,9 @@ namespace WebFrontend.Controllers
         private readonly IOrderService_WriteSide orderService_WriteSide;
         private readonly IOrderService_ReadSide orderService_ReadSide;
 
-        public HomeController(ILogger<HomeController> logger, 
-                                     IOrderService_WriteSide orderService_WriteSide,
-                                     IOrderService_ReadSide orderService_ReadSide)
+        public HomeController(ILogger<HomeController> logger,
+                              IOrderService_WriteSide orderService_WriteSide,
+                              IOrderService_ReadSide orderService_ReadSide)
         {
             _logger = logger;
             this.orderService_WriteSide = orderService_WriteSide;
@@ -36,13 +36,6 @@ namespace WebFrontend.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public IActionResult DeleteOrderLine(Guid orderId, Guid orderLineId)
-        {
-            orderService_WriteSide.DeleteOrderLine(orderId, orderLineId);
-
-            return RedirectToAction("OrderDetails", new { id = orderId });
-        }
-
         public IActionResult CreateNewOrder()
         {
             return View(new CreateOrderModel());
@@ -57,21 +50,28 @@ namespace WebFrontend.Controllers
             return RedirectToAction("OrderDetails", new { id = orderId });
         }
 
-
         [HttpPost]
-        public IActionResult AddOrderLine(Guid orderId, OrderLine orderline)
+        public IActionResult CancelOrder(Guid OrderId)
         {
-            orderService_WriteSide.AddOrderLine(orderId, orderline);
+            orderService_WriteSide.UpdateOrderState(OrderId, OrderState.cancel);
+
+            return RedirectToAction("OrderDetails", new { id = OrderId });
+        }
+
+        public IActionResult DeleteOrderLine(Guid orderId, Guid orderLineId)
+        {
+            orderService_WriteSide.DeleteOrderLine(orderId, orderLineId);
 
             return RedirectToAction("OrderDetails", new { id = orderId });
         }
 
-
-        public IActionResult ListAllOrders()
+        [HttpPost]
+        public IActionResult AddOrderLine(Guid orderId, OrderLine orderline)
         {
-            var orders = orderService_ReadSide.LoadAllOrders();
+            orderline.Id = Guid.NewGuid();
+            orderService_WriteSide.AddOrderLine(orderId, orderline);
 
-            return View(orders);
+            return RedirectToAction("OrderDetails", new { id = orderId });
         }
 
         public IActionResult OrderDetails(Guid id)
@@ -81,12 +81,11 @@ namespace WebFrontend.Controllers
             return View(order);
         }
 
-        [HttpPost]
-        public IActionResult CancelOrder(Guid OrderId)
+        public IActionResult ListAllOrders()
         {
-            orderService_WriteSide.UpdateOrderState(OrderId, OrderState.cancel);
+            var orders = orderService_ReadSide.LoadAllOrders();
 
-            return RedirectToAction("OrderDetails", new { id = OrderId });
+            return View(orders);
         }
     }
 }

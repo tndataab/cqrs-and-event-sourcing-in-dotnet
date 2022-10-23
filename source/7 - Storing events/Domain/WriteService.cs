@@ -12,15 +12,15 @@ namespace Domain
         void HandleCommand<TCommand>(TCommand command) where TCommand : ICommand;
     }
 
-
     public class WriteService : IWriteService
     {
-        private readonly IOrderRepository orderRepository;
+        private readonly IOrderRepository repository;
         private readonly IEventStore eventStore;
+        private readonly Dictionary<Type, Action<ICommand>> commandHandlers = new();
 
-        public WriteService(IOrderRepository orderRepository, IEventStore eventStore)
+        public WriteService(IOrderRepository repository, IEventStore eventStore)
         {
-            this.orderRepository = orderRepository;
+            this.repository = repository;
             this.eventStore = eventStore;
             ScanAssembly();
         }
@@ -52,16 +52,14 @@ namespace Domain
             }
         }
 
-        private readonly Dictionary<Type, Action<ICommand>> commandHandlers = new();
-
         public void AddCommandHandlerFor<TCommand, THandler>() where TCommand : ICommand
-                                                               where THandler : IHandleCommand<TCommand>
+                                                                where THandler : IHandleCommand<TCommand>
         {
-            var handler = (THandler)Activator.CreateInstance(typeof(THandler), new object[] { orderRepository });
+            var handler = (THandler)Activator.CreateInstance(typeof(THandler), new object[] { repository });
 
             commandHandlers.Add(typeof(TCommand), c =>
             {
-                //Load the existing events
+                //Load all the existing events
                 var events = eventStore.LoadEvents(c.Id);
                 int eventsLoaded = events.Count();
 
@@ -69,7 +67,7 @@ namespace Domain
                 var newEvents = handler.Handle((TCommand)c).ToList();
 
                 Console.WriteLine("\r\nNew events");
-                foreach(var e in newEvents)
+                foreach (var e in newEvents)
                 {
                     Console.WriteLine(e.ToString());
                 }
@@ -79,10 +77,9 @@ namespace Domain
                 {
                     eventStore.SaveEvents(c.Id, eventsLoaded, newEvents);
                 }
-
             });
-        }
 
+        }
 
         public void HandleCommand<TCommand>(TCommand command) where TCommand : ICommand
         {
@@ -90,7 +87,8 @@ namespace Domain
 
             if (commandHandlers.ContainsKey(typeof(TCommand)))
             {
-                commandHandlers[typeof(TCommand)](command);
+                var handler = commandHandlers[typeof(TCommand)];
+                handler(command);
             }
             else
             {

@@ -21,7 +21,7 @@ namespace Domain
 
         public IEnumerable<IEvent> LoadEvents(Guid aggregateId)
         {
-            return events.Where(e => e.Id == aggregateId).ToList();
+            return events.Where(e => e.Id == aggregateId);
         }
 
         public void SaveEvents(Guid aggregateId, int eventsLoaded, List<IEvent> newEvents)
@@ -38,6 +38,5 @@ namespace Domain
         {
             return events;
         }
-
     }
 }

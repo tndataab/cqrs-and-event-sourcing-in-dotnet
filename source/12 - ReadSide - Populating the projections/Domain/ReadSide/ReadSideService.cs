@@ -12,7 +12,6 @@ namespace Domain.ReadSide
         TResult Query<TProjection, TResult>(Func<TProjection, TResult> query) where TProjection : Projection, new();
     }
 
-
     public class ReadService : IReadService
     {
         private readonly IReadsideEventStore eventStore;
@@ -33,8 +32,10 @@ namespace Domain.ReadSide
 
         public TResult Query<TProjection, TResult>(Func<TProjection, TResult> query) where TProjection : Projection, new()
         {
+            //Get an instance of the requested projection
             var projectionInstance = (TProjection)projectionInstances[typeof(TProjection)];
 
+            //Pass the projection to the lambda and execute it
             return query(projectionInstance);
         }
 
@@ -45,30 +46,21 @@ namespace Domain.ReadSide
                 subscriber(e);
             }
         }
-        
-        
+
         private void ScanAssembly()
         {
             //1. Find all projections / events
-            var assembly = Assembly.GetExecutingAssembly();
-
-            var projections =
-                from t in assembly.GetTypes()
-                from i in t.GetInterfaces()
-                where i.IsGenericType
-                where i.GetGenericTypeDefinition() == typeof(IBuildFrom<>)
-                select new
-                {
-                    EventType = i.GetGenericArguments()[0],
-                    ProjectionType = t
-                };
-
-            Console.WriteLine("\r\nReadside projection subscribers");
-            foreach (var projection in projections)
-                Console.WriteLine(projection.EventType + " " + projection.ProjectionType);
-
+            var projections = FindAllProjections();
 
             //2. Create an instance of each projection
+            CreateProjectionInstances(projections);
+
+            //3. map corresponding event -> to projection instance
+            MapEventsToProjections(projections);
+        }
+
+        private void CreateProjectionInstances(List<(Type EventType, Type ProjectionType)> projections)
+        {
             foreach (var p in projections)
             {
                 if (!projectionInstances.ContainsKey(p.ProjectionType))
@@ -81,9 +73,31 @@ namespace Domain.ReadSide
                     projectionInstances.Add(p.ProjectionType, (Projection)instance);
                 }
             }
+        }
 
+        private List<(Type EventType, Type ProjectionType)> FindAllProjections()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
 
-            //3. map corresponding event -> to projection instance
+            var projections =
+                from t in assembly.GetTypes()
+                from i in t.GetInterfaces()
+                where i.IsGenericType
+                where i.GetGenericTypeDefinition() == typeof(IBuildFrom<>)
+                select (EventType: i.GetGenericArguments()[0],
+                        ProjectionType: t);
+
+            Console.WriteLine("\r\nReadside projection subscribers");
+            foreach (var projection in projections)
+                Console.WriteLine(projection.EventType + " " + projection.ProjectionType);
+
+            Console.WriteLine();
+
+            return projections.ToList();
+        }
+
+        private void MapEventsToProjections(List<(Type EventType, Type ProjectionType)> projections)
+        {
             foreach (var projection in projections)
             {
                 //Lookup the subscriber instance we created earlier
@@ -107,6 +121,5 @@ namespace Domain.ReadSide
                 subscriber.Apply((TEvent)e);
             });
         }
-
     }
 }

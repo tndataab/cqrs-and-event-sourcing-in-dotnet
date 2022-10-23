@@ -47,7 +47,6 @@ public class OrderService_WriteSide : IOrderService_WriteSide
     {
         var order = repository.Load(orderId);
 
-        orderLine.Id = Guid.NewGuid();
         order.orderLines.Add(orderLine);
 
         repository.Update(orderId, order);

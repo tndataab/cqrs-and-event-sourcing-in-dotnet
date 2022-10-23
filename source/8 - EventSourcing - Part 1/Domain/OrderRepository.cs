@@ -4,7 +4,7 @@
 public interface IOrderRepository
 {
     //Commands
-    void Insert(Guid OrderId, Order order);
+    void Insert(Guid orderId, Order order);
     void Update(Guid orderId, Order order);
     
     //Queries
@@ -105,9 +105,8 @@ public class OrderRepository : IOrderRepository
     }
 
     public void Insert(Guid orderId, Order order)
-    { 
+    {
         order.Id = orderId;
-
         ordersDb.Add(orderId, order);
     }
 
