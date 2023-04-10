@@ -53,6 +53,7 @@ namespace WebFrontend.Controllers
             return RedirectToAction("OrderDetails", new { id = OrderId });
         }
 
+        [HttpPost]
         public IActionResult DeleteOrderLine(int orderId, int orderLineId)
         {
             orderService.DeleteOrderLine(orderId, orderLineId);
