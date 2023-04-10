@@ -62,9 +62,9 @@ namespace WebFrontend.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddOrderLine(int orderId, OrderLine orderline)
+        public IActionResult AddOrderLine(int orderId, OrderLine orderLine)
         {
-            orderService.AddOrderLine(orderId, orderline);
+            orderService.AddOrderLine(orderId, orderLine);
 
             return RedirectToAction("OrderDetails", new { id = orderId });
         }

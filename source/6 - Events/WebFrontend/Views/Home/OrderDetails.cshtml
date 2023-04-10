@@ -50,7 +50,14 @@
             <td>@orderLine.Name</td>
             <td>@orderLine.Price</td>
             <td>@orderLine.Quantity</td>
-            <td> <a asp-action="DeleteOrderLine" asp-route-orderid="@Model.Id" asp-route-orderlineid="@orderLine.Id">Delete</a></td>
+            <td>
+                <!-- delete orderline button -->
+                <form asp-action="DeleteOrderLine">
+                    <input type="hidden" name="orderid" value="@Model.Id">
+                    <input type="hidden" name="orderlineid" value="@orderLine.Id">
+                    <input type="submit" value="Delete" class="btn btn-secondary btn-sm" />
+                </form>
+            </td>
         </tr>
     }
 </table>

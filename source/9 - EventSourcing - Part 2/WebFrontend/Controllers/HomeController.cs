@@ -1,4 +1,5 @@
 ﻿using Domain;
+using Domain.WriteSide;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using WebFrontend.Models;
@@ -64,6 +65,7 @@ namespace WebFrontend.Controllers
             return RedirectToAction("OrderDetails", new { id = OrderId });
         }
 
+        [HttpPost]
         public IActionResult DeleteOrderLine(Guid orderId, Guid orderLineId)
         {
             writeService.HandleCommand(new DeleteOrderLine()
@@ -76,14 +78,14 @@ namespace WebFrontend.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddOrderLine(Guid orderId, OrderLine orderline)
+        public IActionResult AddOrderLine(Guid orderId, OrderLine orderLine)
         {
-            orderline.Id = Guid.NewGuid();
+            orderLine.Id = Guid.NewGuid();
 
             writeService.HandleCommand(new AddOrderLine()
             {
                 Id = orderId,
-                OrderLine = orderline
+                OrderLine = orderLine
             });
 
             return RedirectToAction("OrderDetails", new { id = orderId });
@@ -93,7 +95,6 @@ namespace WebFrontend.Controllers
         {
             //var order = orderService_ReadSide.LoadOrder(id);
             var order = new Order();
-
             return View(order);
         }
 
@@ -101,7 +102,6 @@ namespace WebFrontend.Controllers
         {
             //var orders = orderService_ReadSide.LoadAllOrders();
             var orders = new List<OrderSummary>();
-
             return View(orders);
         }
     }

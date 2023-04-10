@@ -1,4 +1,5 @@
 using Domain;
+using Domain.WriteSide;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +8,6 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddSingleton<IEventStore, EventStore>();
 builder.Services.AddSingleton<IWriteService, WriteService>();
-
 
 var app = builder.Build();
 

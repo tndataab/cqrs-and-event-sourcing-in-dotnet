@@ -58,6 +58,7 @@ namespace WebFrontend.Controllers
             return RedirectToAction("OrderDetails", new { id = OrderId });
         }
 
+        [HttpPost]
         public IActionResult DeleteOrderLine(Guid orderId, Guid orderLineId)
         {
             orderService_WriteSide.DeleteOrderLine(orderId, orderLineId);
@@ -66,10 +67,10 @@ namespace WebFrontend.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddOrderLine(Guid orderId, OrderLine orderline)
+        public IActionResult AddOrderLine(Guid orderId, OrderLine orderLine)
         {
-            orderline.Id = Guid.NewGuid();
-            orderService_WriteSide.AddOrderLine(orderId, orderline);
+            orderLine.Id = Guid.NewGuid();
+            orderService_WriteSide.AddOrderLine(orderId, orderLine);
 
             return RedirectToAction("OrderDetails", new { id = orderId });
         }

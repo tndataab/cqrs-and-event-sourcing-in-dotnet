@@ -35,6 +35,20 @@ namespace Domain.ReadSide
             public List<OrderLine> orderLines { get; set; }
         }
 
+        public List<OrderSummary> GetOrderSummaryList()
+        {
+            return orderDict.Values.Select(o =>
+                    new OrderSummary()
+                    {
+                        Id = o.Id,
+                        orderState = o.orderState,
+                        CustomerId = o.CustomerId,
+                        CustomerName = o.CustomerName,
+                        OrderValue = o.OrderValue,
+                    }
+            ).ToList();
+        }
+
         public void Apply(OrderCreated e)
         {
             orderDict.Add(e.Id, new OrderDetails()
@@ -63,20 +77,6 @@ namespace Domain.ReadSide
         {
             orderDict[e.Id].orderLines.RemoveAll(ol => ol.Id == e.Id);
             orderDict[e.Id].OrderValue = CalculateOrderValue(orderDict[e.Id]);
-        }
-
-        public List<OrderSummary> GetOrderSummaryList()
-        {
-            return orderDict.Values.Select(o =>
-                    new OrderSummary()
-                    {
-                        Id = o.Id,
-                        orderState = o.orderState,
-                        CustomerId = o.CustomerId,
-                        CustomerName = o.CustomerName,
-                        OrderValue = o.OrderValue,
-                    }
-            ).ToList();
         }
 
         private decimal CalculateOrderValue(OrderDetails order)

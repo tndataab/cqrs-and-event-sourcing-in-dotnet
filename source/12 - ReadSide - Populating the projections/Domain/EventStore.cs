@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace Domain
 {
+    public interface IReadsideEventStore
+    {
+        void ForAllEvents(Action<IEvent> apply);
+    }
+
     public interface IEventStore
     {
         IEnumerable<IEvent> LoadEvents(Guid aggregateId);
@@ -14,14 +19,10 @@ namespace Domain
         IEnumerable<IEvent> GetAllEvents();
     }
 
-    public interface IReadsideEventStore
-    {
-        void ForAllEvents(Action<IEvent> apply);
-    }
-
     public class EventStore : IEventStore, IReadsideEventStore
     {
         private List<IEvent> events = new List<IEvent>();
+
         private Action<IEvent> eventCallback;
         private int eventRead = 0;
 
@@ -47,8 +48,6 @@ namespace Domain
                 }
             }
         }
-
-
 
         public IEnumerable<IEvent> LoadEvents(Guid aggregateId)
         {

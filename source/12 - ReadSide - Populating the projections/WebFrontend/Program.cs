@@ -1,5 +1,6 @@
 using Domain;
 using Domain.ReadSide;
+using Domain.WriteSide;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,9 +11,7 @@ builder.Services.AddSingleton<IEventStore, EventStore>();
 builder.Services.AddSingleton<IWriteService, WriteService>();
 
 builder.Services.AddSingleton<IReadsideEventStore>(ctx => (IReadsideEventStore)ctx.GetService<IEventStore>());
-
 builder.Services.AddSingleton<IReadService, ReadService>();
-
 
 var app = builder.Build();
 

@@ -14,7 +14,6 @@ namespace Domain
         IEnumerable<IEvent> GetAllEvents();
     }
 
-
     public class EventStore : IEventStore
     {
         private List<IEvent> events = new List<IEvent>();
